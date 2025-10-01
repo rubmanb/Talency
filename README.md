@@ -50,11 +50,15 @@ Clonar el repositorio.
 
 Configurar la base de datos MySQL en src/main/resources/application.properties:
 
-spring.datasource.url=jdbc:mysql://localhost:3306/rrhh_app?useSSL=false&serverTimezone=UTC
-spring.datasource.username=tu_usuario
-spring.datasource.password=tu_password
+```bash
+spring.application.name=talency
+spring.datasource.url=jdbc:mysql://localhost:3306/{db_name}?useSSL=false&serverTimezone=UTC
+spring.datasource.username={username}
+spring.datasource.password={password}
 spring.jpa.hibernate.ddl-auto=update
-
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
 
 ##Ejecutar la aplicación con:
 
