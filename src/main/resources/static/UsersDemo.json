@@ -1,0 +1,26 @@
+[
+  {
+    "username": "admin_demo",
+    "password": "Admin123!",
+    "email": "admin@empresa.com",
+    "roles": ["ADMIN"]
+  },
+  {
+    "username": "hr_julia",
+    "password": "Julia2025",
+    "email": "julia.hr@empresa.com",
+    "roles": ["HR"]
+  },
+  {
+    "username": "hr_miguel",
+    "password": "Miguel2025",
+    "email": "miguel.hr@empresa.com",
+    "roles": ["HR"]
+  },
+  {
+    "username": "hr_laura",
+    "password": "Laura2025",
+    "email": "laura.hr@empresa.com",
+    "roles": ["HR"]
+  }
+]
