@@ -54,7 +54,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserDTO createUserDTO) {
         User user = new User();
-        user.setEmail(createUserDTO.getUsername());
+        user.setUsername(createUserDTO.getUsername());
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
 
