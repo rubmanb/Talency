@@ -1,27 +1,27 @@
-#Talency - Gestión de RRHH
-
+## Talency - Gestión de RRHH
+---
 ##Descripción
 Talency es una aplicación web para la gestión de empleados y recursos humanos dentro de una empresa. Permite gestionar usuarios, asignar roles y mantener un registro básico de información laboral. Este proyecto está pensado como aprendizaje y práctica personal con Spring Boot 3.5.6, Java 21, MySQL y Angular.
 
-#Tecnologías
+### Tecnologías
 
-Backend: Spring Boot 3.5.6, Java 21
+- Backend: Spring Boot 3.5.6, Java 21
 
-Base de datos: MySQL (Workbench)
+- Base de datos: MySQL (Workbench)
 
-Frontend: Angular (proyecto separado)
+- Frontend: Angular (proyecto separado)
 
-##Dependencias destacadas:
+### Dependencias destacadas:
 
-Spring Web
+- Spring Web
 
-Spring Data JPA
+- Spring Data JPA
 
-Validation (Bean Validation / Hibernate Validator)
+- Validation (Bean Validation / Hibernate Validator)
 
-Lombok
+- Lombok
 
-##Estructura del proyecto
+### Estructura del proyecto
 ```bash
 src/main/java/com/tuempresa/rrhh
  ├── user
@@ -34,17 +34,17 @@ src/main/java/com/tuempresa/rrhh
  ├── config               → Configuración de seguridad y CORS
  └── RrhhApplication.java → Clase principal Spring Boot
 ```
-##Funcionalidades actuales
+### Funcionalidades actuales
 
-CRUD de usuarios (User)
+- CRUD de usuarios (User)
 
-Asignación de roles (Role)
+- Asignación de roles (Role)
 
-API REST básica lista para integrarse con Angular
+- API REST básica lista para integrarse con Angular
 
-Validación de datos con Bean Validation
+- Validación de datos con Bean Validation
 
-##Configuración
+### Configuración
 
 Clonar el repositorio.
 
@@ -60,23 +60,23 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 ```
 
-##Ejecutar la aplicación con:
+### Ejecutar la aplicación con:
 
-mvn spring-boot:run
+> mvn spring-boot:run
 
-Endpoints principales (Users)
+#### Endpoints principales (Users)
 
-GET /api/users → Listar todos los usuarios
+- GET /api/users → Listar todos los usuarios
 
-GET /api/users/{id} → Obtener usuario por ID
+- GET /api/users/{id} → Obtener usuario por ID
 
-POST /api/users → Crear usuario
+- POST /api/users → Crear usuario
 
-PUT /api/users/{id} → Actualizar usuario
+- PUT /api/users/{id} → Actualizar usuario
 
-DELETE /api/users/{id} → Eliminar usuario
+- DELETE /api/users/{id} → Eliminar usuario
 
-##Notas
+### Notas
 
 Las contraseñas deben ser encriptadas antes de guardar (recomendado BCrypt).
 
