@@ -1,6 +1,6 @@
 ## Talency - Gestión de RRHH
 ---
-##Descripción
+### Descripción
 Talency es una aplicación web para la gestión de empleados y recursos humanos dentro de una empresa. Permite gestionar usuarios, asignar roles y mantener un registro básico de información laboral. Este proyecto está pensado como aprendizaje y práctica personal con Spring Boot 3.5.6, Java 21, MySQL y Angular.
 
 ### Tecnologías
