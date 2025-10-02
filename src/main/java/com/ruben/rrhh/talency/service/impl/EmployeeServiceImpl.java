@@ -51,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto) {
+    public Optional<EmployeeResponseDTO> updateEmployee(Long id, EmployeeRequestDTO dto) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
@@ -63,7 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setDepartment(department);
 
         Employee updated = employeeRepository.save(employee);
-        return mapToResponse(updated);
+        return Optional.of(mapToResponse(updated));
     }
 
     @Override

@@ -26,8 +26,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // desactiva CSRF para Postman / desarrollo
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users").permitAll()           // POST a /api/users
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")  // GET, PUT, DELETE
+                        .requestMatchers("/api/users").permitAll()          // POST a /api/users
+                        .requestMatchers("/api/users/**").permitAll()  // GET, PUT, DELETE -> hasRole("ADMIN")
                         .anyRequest().authenticated()                        // otros endpoints requieren login
                 )
                 .httpBasic(Customizer.withDefaults()); // forma moderna de httpBasic

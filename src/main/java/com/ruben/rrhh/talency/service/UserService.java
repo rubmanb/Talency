@@ -16,7 +16,10 @@ public interface UserService {
 
     Optional<UserResponseDTO> getUserById(Long id);
 
-    UserResponseDTO updateUser(Long id, UserRequestDTO dto);
+    Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto);
 
     void deleteUser(Long id);
+
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

@@ -11,6 +11,7 @@ import com.ruben.rrhh.talency.repository.UserRepository;
 import com.ruben.rrhh.talency.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         // Vincular empleado
-        Employee employee = employeeRepository.findById(String.valueOf(dto.getEmployeeId()))
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         user.setEmployee(employee);
 
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+    public Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        Employee employee = employeeRepository.findById(String.valueOf(dto.getEmployeeId()))
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         user.setEmployee(employee);
 
@@ -87,12 +88,23 @@ public class UserServiceImpl implements UserService {
         user.setRoles(new HashSet<>(roles));
 
         User updated = userRepository.save(user);
-        return mapToResponse(updated);
+        return Optional.of(mapToResponse(updated));
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+         userRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     // Mapper privado

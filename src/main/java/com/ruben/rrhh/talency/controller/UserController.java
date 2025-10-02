@@ -2,11 +2,17 @@ package com.ruben.rrhh.talency.controller;
 
 import com.ruben.rrhh.talency.dto.UserRequestDTO;
 import com.ruben.rrhh.talency.dto.UserResponseDTO;
+import com.ruben.rrhh.talency.entities.User;
 import com.ruben.rrhh.talency.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -36,17 +42,30 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request) {
-        try {
-            return ResponseEntity.ok(userService.updateUser(id, request));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request, BindingResult bindingResult) {
+        if(bindingResult.hasFieldErrors()){
+            return validation(bindingResult);
         }
+        Optional<UserResponseDTO> userOptional = userService.updateUser(id, request);
+        if(userOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.CREATED).body(userOptional.orElseThrow());
+        }
+        return ResponseEntity.noContent().build();
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    private ResponseEntity<UserResponseDTO> validation(BindingResult bindingResult) {
+        Map<String, String> errors = new HashMap<>();
+
+        bindingResult.getFieldErrors().forEach(error -> {
+
+            errors.put(error.getField(), "The field " + error.getField() + " " + error.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body((UserResponseDTO) errors);
     }
 }
