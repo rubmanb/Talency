@@ -1,4 +1,4 @@
-package com.ruben.rrhh.talency.model;
+package com.ruben.rrhh.talency.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,5 +14,5 @@ public class Role {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String name; // Ej: "ADMIN", "HR", "EMPLOYEE"
+    private String name; // "ADMIN", "HR", "EMPLOYEE"
 }
