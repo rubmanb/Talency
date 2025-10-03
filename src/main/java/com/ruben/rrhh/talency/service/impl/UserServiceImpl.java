@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,21 +38,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO dto) {
+        // Validar que no exista username o email
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        // Obtener y validar empleado
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        // Validar que el empleado no tenga ya un usuario
+        if (employee.getUser() != null) {
+            throw new RuntimeException("Employee already has a user account");
+        }
+
+        // Validar roles según lógica de negocio
+        validateRoles(dto.getRoleIds(), dto.getCurrentUserRole());
+
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        // Vincular empleado
-        Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
         user.setEmployee(employee);
+        user.setActive(true);
+        user.setCreatedAt(LocalDateTime.now());
 
         // Vincular roles
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
         user.setRoles(new HashSet<>(roles));
 
         User saved = userRepository.save(user);
+
+        // Actualizar la relación bidireccional
+        employee.setUser(saved);
+        employeeRepository.save(employee);
 
         return mapToResponse(saved);
     }
@@ -69,9 +92,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto) {
+    public Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto, String currentUserRole) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Validar unicidad de username y email (excluyendo el actual)
+        if (userRepository.existsByUsernameAndIdNot(dto.getUsername(), id)) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
+            throw new RuntimeException("Email already exists");
+        }
 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
@@ -80,10 +111,10 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
-        user.setEmployee(employee);
+        // Validar roles según permisos del usuario actual
+        validateRoles(dto.getRoleIds(), currentUserRole);
 
+        // Actualizar roles
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
         user.setRoles(new HashSet<>(roles));
 
@@ -94,7 +125,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
-         userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Limpiar la relación con el empleado
+        if (user.getEmployee() != null) {
+            user.getEmployee().setUser(null);
+            employeeRepository.save(user.getEmployee());
+        }
+
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -107,14 +147,74 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    // Mapper privado
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public List<UserResponseDTO> getActiveUsers() {
+        return userRepository.findByIsActiveTrue().stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public void deactivateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void activateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    // 🔐 Validación de roles según permisos
+    private void validateRoles(List<Long> roleIds, String currentUserRole) {
+        List<Role> selectedRoles = roleRepository.findAllById(roleIds);
+
+        // Si el usuario actual es RH, no puede asignar ROLE_ADMIN
+        if ("ROLE_HR".equals(currentUserRole)) {
+            boolean hasAdminRole = selectedRoles.stream()
+                    .anyMatch(role -> "ROLE_ADMIN".equals(role.getName()));
+            if (hasAdminRole) {
+                throw new RuntimeException("HR users cannot assign ADMIN role");
+            }
+        }
+
+        // Validar que no se asignen roles inválidos
+        if (selectedRoles.isEmpty()) {
+            throw new RuntimeException("At least one role must be assigned");
+        }
+    }
+
+    // Mapper mejorado
     private UserResponseDTO mapToResponse(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setEmployeeName(user.getEmployee() != null ? user.getEmployee().getFirstName() : null);
-        dto.setRoles(user.getRoles().stream().map(Role::getName).toList());
+        dto.setActive(user.isActive());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+
+        if (user.getEmployee() != null) {
+            dto.setEmployeeId(user.getEmployee().getId());
+            dto.setEmployeeName(user.getEmployee().getFirstName() + " " + user.getEmployee().getLastName());
+            dto.setEmployeeDni(user.getEmployee().getDni());
+            dto.setEmployeePosition(user.getEmployee().getPosition());
+        }
+
+        dto.setRoles(user.getRoles().stream()
+                .map(Role::getName)
+                .toList());
+
         return dto;
     }
 }

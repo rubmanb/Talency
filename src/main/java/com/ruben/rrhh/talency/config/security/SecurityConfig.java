@@ -2,12 +2,15 @@ package com.ruben.rrhh.talency.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     // -----------------------------
@@ -24,13 +27,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // desactiva CSRF para Postman / desarrollo
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users").permitAll()          // POST a /api/users
-                        .requestMatchers("/api/users/**").permitAll()  // GET, PUT, DELETE -> hasRole("ADMIN")
-                        .anyRequest().authenticated()                        // otros endpoints requieren login
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/api/users/check-**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "HR")
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()); // forma moderna de httpBasic
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
         return http.build();
     }

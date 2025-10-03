@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "employees")
@@ -24,8 +27,11 @@ public class Employee {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Column
+    private Date dateOfBirth;
+
+    @Column
+    private String gender;
 
     @Column(unique = true, nullable = false)
     private String dni;
@@ -43,10 +49,16 @@ public class Employee {
     private String country;
 
     @Column
-    private Integer phone;
+    private String phone;
+
+    @Column
+    private String emergencyContact;
 
     @Column(nullable = false)
     private String position; // cargo o puesto
+
+    @Column
+    private String jobLevel; // categoria o rango del puesto de trabajo
 
     @Column
     private String contractType;
@@ -54,9 +66,16 @@ public class Employee {
     @Column
     private LocalDateTime contractExpireDate;
 
+    @Column
     private LocalDate hireDate; // fecha de alta en la empresa
+
+    @Column
     private LocalDate fireDate; // fecha de despido en la empresa
 
+    @Column
+    private LocalDate vacations;
+
+    @Column
     private boolean active = true; // empleado activo o no
 
     // Relación opcional con User
@@ -76,4 +95,26 @@ public class Employee {
 
     @Column(unique = true)
     private String iban; // Encrypt
+
+    @Column
+    private String maritalStatus;
+
+    @Column
+    private String emailPersonal;
+
+    @Column
+    private String workSchedule; // Shift → horario de trabajo (mañana/tarde, 8h/día, etc.)
+
+    @Column
+    private Integer vacationsDaysAllocated; // (días asignados) → más claro que solo vacations
+
+    @Column
+    private Integer vacationsDaysUsed; // → días ya usados
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VacationHistory> vacationHistory = new ArrayList<>();
+
+    @Column
+    private String seniority; // Antigüedad
+
 }

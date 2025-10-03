@@ -3,6 +3,7 @@ package com.ruben.rrhh.talency.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,5 +37,10 @@ public class User {
     @OneToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    // Campos de control
+    private boolean isActive = true;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
 
 }
