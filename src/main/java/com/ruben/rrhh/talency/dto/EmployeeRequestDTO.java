@@ -39,6 +39,6 @@ public class EmployeeRequestDTO {
     private Integer vacationsDaysAllocated;
     private Integer vacationsDaysUsed;
     private Long departmentId;
-    private Long userId; // si quieres asociar un User existente
+    private Long userId;
     private String seniority;
 }

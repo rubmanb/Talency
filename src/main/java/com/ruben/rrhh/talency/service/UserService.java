@@ -3,7 +3,6 @@ package com.ruben.rrhh.talency.service;
 import com.ruben.rrhh.talency.dto.UserRequestDTO;
 import com.ruben.rrhh.talency.dto.UserResponseDTO;
 import com.ruben.rrhh.talency.entities.User;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

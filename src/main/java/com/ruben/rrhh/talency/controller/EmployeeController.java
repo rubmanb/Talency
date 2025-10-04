@@ -3,6 +3,7 @@ package com.ruben.rrhh.talency.controller;
 import com.ruben.rrhh.talency.dto.EmployeeRequestDTO;
 import com.ruben.rrhh.talency.dto.EmployeeResponseDTO;
 import com.ruben.rrhh.talency.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -24,7 +25,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody EmployeeRequestDTO dto, BindingResult bindingResult) {
+    public ResponseEntity<?> createEmployee(@Valid  @RequestBody EmployeeRequestDTO dto, BindingResult bindingResult) {
         if(bindingResult.hasFieldErrors()){
             return validation(bindingResult);
         }

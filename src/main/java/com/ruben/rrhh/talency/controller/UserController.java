@@ -2,7 +2,6 @@ package com.ruben.rrhh.talency.controller;
 
 import com.ruben.rrhh.talency.dto.UserRequestDTO;
 import com.ruben.rrhh.talency.dto.UserResponseDTO;
-import com.ruben.rrhh.talency.entities.User;
 import com.ruben.rrhh.talency.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,21 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping("/initial-setup")
+    public ResponseEntity<?> createInitialAdmin(@RequestBody UserRequestDTO request) {
+        try {
+            // Forzar rol de ADMIN para el setup inicial
+            request.setCurrentUserRole("ROLE_ADMIN");
+
+            UserResponseDTO createdUser = userService.createUser(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", e.getMessage())
+            );
+        }
     }
 
     @PostMapping

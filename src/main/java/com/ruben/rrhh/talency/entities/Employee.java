@@ -106,7 +106,7 @@ public class Employee {
     private String workSchedule; // Shift → horario de trabajo (mañana/tarde, 8h/día, etc.)
 
     @Column
-    private Integer vacationsDaysAllocated; // (días asignados) → más claro que solo vacations
+    private Integer vacationsDaysAllocated; // (días asignados)
 
     @Column
     private Integer vacationsDaysUsed; // → días ya usados
