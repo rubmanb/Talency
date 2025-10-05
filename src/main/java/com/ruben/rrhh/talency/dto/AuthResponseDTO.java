@@ -12,5 +12,8 @@ public class AuthResponseDTO {
     private List<String> roles;
 
     public AuthResponseDTO(String token, String bearer, List<String> roles) {
+        this.token = token;
+        this.type = type;
+        this.roles = roles;
     }
 }

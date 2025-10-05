@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -49,15 +48,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        // 🔓 ENDPOINTS PÚBLICOS
-                        .requestMatchers("/api/auth/**").permitAll() // ← LOGIN PÚBLICO
+                        .requestMatchers("/api/auth/**").permitAll() // ← LOGIN PÚBLICO OJO SE TIENE QUE CAMBIAR
                         .requestMatchers("/api/users/check-**").permitAll()
                         .requestMatchers("/api/users/initial-setup").permitAll()
-
-                        // 👥 ENDPOINTS DE EMPLEADOS (temporalmente públicos)
                         .requestMatchers("/api/employees/**").permitAll()
-
-                        // 🔐 ENDPOINTS PROTEGIDOS
                         .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")

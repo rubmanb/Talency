@@ -4,6 +4,7 @@ import com.ruben.rrhh.talency.config.security.JwtUtil;
 import com.ruben.rrhh.talency.dto.AuthRequestDTO;
 import com.ruben.rrhh.talency.dto.AuthResponseDTO;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,38 +13,45 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
 
     public AuthService(AuthenticationManager authenticationManager,
                        CustomUserDetailsService userDetailsService,
                        JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
     }
 
     public AuthResponseDTO authenticate(AuthRequestDTO request) {
-        // Autenticar con Spring Security
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Generar JWT
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = jwtUtil.generateToken(userDetails);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        return new AuthResponseDTO(token, "Bearer", getRoles(userDetails));
+            String token = jwtUtil.generateToken(userDetails);
+
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+
+            return new AuthResponseDTO(token, "Bearer", roles);
+
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
     }
 
     private List<String> getRoles(UserDetails userDetails) {
