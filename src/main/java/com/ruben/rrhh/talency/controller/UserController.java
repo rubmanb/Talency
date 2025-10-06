@@ -3,6 +3,7 @@ package com.ruben.rrhh.talency.controller;
 import com.ruben.rrhh.talency.dto.UserRequestDTO;
 import com.ruben.rrhh.talency.dto.UserResponseDTO;
 import com.ruben.rrhh.talency.service.UserService;
+import com.ruben.rrhh.talency.validation.Validation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,8 +25,11 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final Validation validation;
+
+    public UserController(UserService userService, Validation validation) {
         this.userService = userService;
+        this.validation = validation;
     }
 
     @PostMapping("/initial-setup")
@@ -49,7 +52,8 @@ public class UserController {
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal UserDetails userDetails) {
         if (bindingResult.hasErrors()) {
-            return validation(bindingResult);
+
+            return validation.validate(bindingResult);
         }
 
         try {
@@ -95,7 +99,7 @@ public class UserController {
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal UserDetails userDetails) {
         if (bindingResult.hasErrors()) {
-            return validation(bindingResult);
+            return validation.validate(bindingResult);
         }
 
         try {
@@ -180,16 +184,5 @@ public class UserController {
                 .orElse("ROLE_EMPLOYEE");
     }
 
-    // Método de validación mejorado
-    private ResponseEntity<Map<String, String>> validation(BindingResult bindingResult) {
-        Map<String, String> errors = new HashMap<>();
 
-        bindingResult.getFieldErrors().forEach(error -> {
-            String fieldName = error.getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage != null ? errorMessage : "Validation error");
-        });
-
-        return ResponseEntity.badRequest().body(errors);
-    }
 }

@@ -7,4 +7,8 @@ import lombok.Setter;
 public class DepartmentRequestDTO {
 
     private String name;
+    private String employeeCount;
+    private String managerName;
+    private Integer budget;
+    private boolean active = true;
 }

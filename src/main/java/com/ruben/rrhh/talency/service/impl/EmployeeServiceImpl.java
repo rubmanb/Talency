@@ -57,6 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setVacationsDaysAllocated(dto.getVacationsDaysAllocated());
         employee.setVacationsDaysUsed(dto.getVacationsDaysUsed());
         employee.setSeniority(dto.getSeniority());
+        employee.setActive(dto.isActive());
 
         // Datos financieros
         employee.setBankName(dto.getBankName());
@@ -74,8 +75,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         // Relación con Department
-        if (dto.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(dto.getDepartmentId())
+        if (dto.getDepartmentName() != null) {
+            Department department = departmentRepository.findById(dto.getDepartmentName())
                     .orElseThrow(() -> new RuntimeException("Department not found"));
             employee.setDepartment(department);
         }
@@ -134,6 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Otros
         employee.setMaritalStatus(dto.getMaritalStatus());
         employee.setEmailPersonal(dto.getEmailPersonal());
+        employee.setActive(dto.isActive());
 
         // Actualizar relaciones
         if (dto.getUserId() != null) {
@@ -142,8 +144,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setUser(user);
         }
 
-        if (dto.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(dto.getDepartmentId())
+        if (dto.getDepartmentName() != null) {
+            Department department = departmentRepository.findById(dto.getDepartmentName())
                     .orElseThrow(() -> new RuntimeException("Department not found"));
             employee.setDepartment(department);
         }
@@ -165,6 +167,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         dto.setFirstName(employee.getFirstName());
         dto.setLastName(employee.getLastName());
         dto.setFullName(employee.getFirstName() + " " + employee.getLastName());
+        dto.setDateOfBirth(employee.getDateOfBirth());
         dto.setEmailPersonal(employee.getEmailPersonal());
         dto.setDni(employee.getDni());
         dto.setHealthInsuranceNumber(employee.getHealthInsuranceNumber());
@@ -190,7 +193,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                         (employee.getVacationsDaysUsed() != null ? employee.getVacationsDaysUsed() : 0)
         );
         dto.setSeniority(employee.getSeniority());
-        dto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null);
+        dto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getId() : null);
+        dto.setActive(employee.isActive());
 
         // Mapear historial de vacaciones
         List<VacationHistoryDTO> vacationHistoryDTOs = employee.getVacationHistory().stream()

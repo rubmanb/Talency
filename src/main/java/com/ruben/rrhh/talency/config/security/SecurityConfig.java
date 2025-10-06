@@ -51,11 +51,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll() // ← LOGIN PÚBLICO OJO SE TIENE QUE CAMBIAR
                         .requestMatchers("/api/users/check-**").permitAll()
                         .requestMatchers("/api/users/initial-setup").permitAll()
+                        // Employees
+                        .requestMatchers(HttpMethod.GET, "/api/employees").permitAll()
                         .requestMatchers("/api/employees/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN", "HR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "HR")
+                        // Users
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").permitAll() // .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        // Roles
+                        .requestMatchers(HttpMethod.GET, "/api/roles").permitAll()
+                        // Departments
+                        .requestMatchers(HttpMethod.GET, "/api/departments").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.POST, "/api/departments").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.PUT, "/api/departments/**").permitAll() // .hasAnyRole("ADMIN", "HR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/departments/**").permitAll() // .hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

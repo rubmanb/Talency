@@ -3,6 +3,7 @@ package com.ruben.rrhh.talency.service.impl;
 import com.ruben.rrhh.talency.dto.DepartmentRequestDTO;
 import com.ruben.rrhh.talency.dto.DepartmentResponseDTO;
 import com.ruben.rrhh.talency.entities.Department;
+import com.ruben.rrhh.talency.entities.Employee;
 import com.ruben.rrhh.talency.repository.DepartmentRepository;
 import com.ruben.rrhh.talency.service.DepartmentService;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,10 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         department.setName(dto.getName());
+        department.setManagerName(dto.getManagerName());
+        department.setEmployeeCount(dto.getEmployeeCount());
+        department.setBudget(dto.getBudget());
+        department.setActive(dto.isActive());
         Department updated = departmentRepository.save(department);
         return mapToResponse(updated);
     }
@@ -58,9 +63,28 @@ public class DepartmentServiceImpl implements DepartmentService {
         DepartmentResponseDTO dto = new DepartmentResponseDTO();
         dto.setId(department.getId());
         dto.setName(department.getName());
+
         if (department.getEmployees() != null) {
-            dto.setEmployeeNames(department.getEmployees().stream().map(e -> e.getFirstName()).toList());
+            dto.setEmployeeCount(department.getEmployees().size());
+            dto.setEmployeeNames(department.getEmployees().stream()
+                    .map(e -> e.getFirstName() + " " + e.getLastName())
+                    .toList());
+
+            Optional<Employee> manager = department.getEmployees().stream()
+                    .filter(e -> e.getPosition() != null && e.getPosition().toLowerCase().contains("manager"))
+                    .findFirst();
+            dto.setManagerName(manager.map(e -> e.getFirstName() + " " + e.getLastName())
+                    .orElse("Sin asignar"));
+
+            dto.setActive(department.getEmployees().stream()
+                    .anyMatch(Employee::isActive));
+        } else {
+            dto.setEmployeeCount(0);
+            dto.setEmployeeNames(List.of());
+            dto.setManagerName("Sin asignar");
+            dto.setActive(false);
         }
+
         return dto;
     }
 }
