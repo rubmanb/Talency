@@ -29,7 +29,8 @@ public class EmployeeController {
         if(bindingResult.hasFieldErrors()){
             return validation(bindingResult);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(dto));
+        EmployeeResponseDTO response = employeeService.createEmployee(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -59,13 +60,12 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
     }
 
-    private ResponseEntity<EmployeeResponseDTO> validation(BindingResult bindingResult) {
+    private ResponseEntity<Map<String, String>> validation(BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
-
         bindingResult.getFieldErrors().forEach(error -> {
-
             errors.put(error.getField(), "The field " + error.getField() + " " + error.getDefaultMessage());
         });
-        return ResponseEntity.badRequest().body((EmployeeResponseDTO) errors);
+        return ResponseEntity.badRequest().body(errors);
     }
+
 }

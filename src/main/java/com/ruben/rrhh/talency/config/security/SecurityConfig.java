@@ -61,12 +61,22 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() // .hasAnyRole("ADMIN", "HR")
                         // Roles
                         .requestMatchers(HttpMethod.GET, "/api/roles").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/roles").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/roles").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/roles").permitAll()
                         // Departments
                         .requestMatchers(HttpMethod.GET, "/api/departments").permitAll() // .hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll() // .hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.POST, "/api/departments").permitAll() // .hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.PUT, "/api/departments/**").permitAll() // .hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.DELETE, "/api/departments/**").permitAll() // .hasRole("ADMIN")
+
+                        //Companies
+                        .requestMatchers("/api/companies/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/companies").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/companies/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/companies/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

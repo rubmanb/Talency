@@ -67,18 +67,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setMaritalStatus(dto.getMaritalStatus());
         employee.setEmailPersonal(dto.getEmailPersonal());
 
+        // Relación con Department
+        if (dto.getDepartmentName() != null && !dto.getDepartmentName().trim().isBlank()) {
+            String normalizedName = capitalizeFirst(dto.getDepartmentName().trim());
+
+            Department department = departmentRepository.findByNameIgnoreCase(normalizedName)
+                    .orElseThrow(() -> new RuntimeException("Department '" + dto.getDepartmentName() + "' not found"));
+
+            employee.setDepartment(department);
+        }
+
         // Relación con User
         if (dto.getUserId() != null) {
             User user = userRepository.findById(dto.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             employee.setUser(user);
-        }
-
-        // Relación con Department
-        if (dto.getDepartmentName() != null) {
-            Department department = departmentRepository.findById(dto.getDepartmentName())
-                    .orElseThrow(() -> new RuntimeException("Department not found"));
-            employee.setDepartment(department);
         }
 
         Employee saved = employeeRepository.save(employee);
@@ -137,17 +140,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmailPersonal(dto.getEmailPersonal());
         employee.setActive(dto.isActive());
 
+        if (dto.getDepartmentName() != null && !dto.getDepartmentName().trim().isEmpty()) {
+            String normalizedName = capitalizeFirst(dto.getDepartmentName().trim());
+
+            Department department = departmentRepository.findByNameIgnoreCase(normalizedName)
+                    .orElseThrow(() -> new RuntimeException("Department '" + dto.getDepartmentName() + "' not found"));
+
+            employee.setDepartment(department);
+        }
+
         // Actualizar relaciones
         if (dto.getUserId() != null) {
             User user = userRepository.findById(dto.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             employee.setUser(user);
-        }
-
-        if (dto.getDepartmentName() != null) {
-            Department department = departmentRepository.findById(dto.getDepartmentName())
-                    .orElseThrow(() -> new RuntimeException("Department not found"));
-            employee.setDepartment(department);
         }
 
         Employee updated = employeeRepository.save(employee);
@@ -193,7 +199,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         (employee.getVacationsDaysUsed() != null ? employee.getVacationsDaysUsed() : 0)
         );
         dto.setSeniority(employee.getSeniority());
-        dto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getId() : null);
+        dto.setDepartmentName(employee.getDepartment() != null ? capitalize(employee.getDepartment().getName()) : null);
         dto.setActive(employee.isActive());
 
         // Mapear historial de vacaciones
@@ -213,6 +219,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         dto.setVacationHistory(vacationHistoryDTOs);
 
         return dto;
+    }
+
+    private String capitalizeFirst(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+    }
+
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) return text;
+        text = text.trim().toLowerCase();
+        return Character.toUpperCase(text.charAt(0)) + text.substring(1);
     }
 
 }

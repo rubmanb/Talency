@@ -37,7 +37,7 @@ public class EmployeeResponseDTO {
     private Integer vacationsDaysUsed;
     private Integer vacationsDaysRemaining; // calculado como allocated - used
     private String seniority;
-    private Long departmentName;
+    private String departmentName;
     private List<VacationHistoryDTO> vacationHistory; // para mostrar el historial de vacaciones
     private boolean active;
     private Date dateOfBirth;

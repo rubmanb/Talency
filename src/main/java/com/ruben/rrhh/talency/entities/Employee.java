@@ -84,7 +84,7 @@ public class Employee {
 
     // Relación con Department (M:1)
     @ManyToOne
-    @JoinColumn(name = "department_name")
+    @JoinColumn(name = "department_name", referencedColumnName = "name")
     private Department department;
 
     /*TODO -> Los datos bancarios deben cambiarse por una Entidad nueva tras el MVP
@@ -116,5 +116,9 @@ public class Employee {
 
     @Column
     private String seniority; // Antigüedad
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
 }

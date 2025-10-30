@@ -20,11 +20,11 @@ import java.util.Map;
 public class RoleController {
 
     private final RoleService roleService;
-    //private final Validation validation;
+    private final Validation validation;
 
     public RoleController(RoleService roleService, Validation validation){
         this.roleService = roleService;
-        //this.validation = validation;
+        this.validation = validation;
     }
 
     @GetMapping
@@ -43,7 +43,7 @@ public class RoleController {
         }
     }
 
-    /* // Quizás en un futuro se tenga que usar si se quieren agregar ROLES. De momento no.
+    // Quizás en un futuro se tenga que usar si se quieren agregar ROLES. De momento no.
     @PostMapping
     public ResponseEntity<?> createRole(@Valid @RequestBody RoleRequestDTO roleRequestDTO,
                                         BindingResult bindingResult){
@@ -59,5 +59,5 @@ public class RoleController {
                     Map.of("error", e.getMessage())
             );
         }
-    }*/
+    }
 }

@@ -38,7 +38,7 @@ public class EmployeeRequestDTO {
     private String workSchedule;
     private Integer vacationsDaysAllocated;
     private Integer vacationsDaysUsed;
-    private Long departmentName;
+    private String departmentName;
     private Long userId;
     private String seniority;
     private boolean active;

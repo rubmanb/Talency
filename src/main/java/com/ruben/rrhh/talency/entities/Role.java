@@ -14,5 +14,16 @@ public class Role {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String name; // "ADMIN", "HR", "EMPLOYEE"
+    private String name; // "COMPANY_ADMIN", "HR_MANAGER", "EMPLOYEE"
+
+
+    /*
+    | Rol                  | Permisos                                                                   | Descripción                                                   |
+| -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 🟣 **SUPER_ADMIN**   | Gestiona todas las empresas.                                          | Puedes ver empresas, activar/desactivar cuentas, planes, etc. |
+| 🔵 **COMPANY_ADMIN** | Crea usuarios de RRHH y gestiona toda su empresa.                          | Es el “cliente principal”.                                    |
+| 🟢 **HR_MANAGER**    | Gestiona empleados, sin acceso a suscripciones o configuración de empresa. |                                                               |
+| 🟠 **EMPLOYEE**      | Solo ve su perfil o nómina (opcional).                                     |                                                               |
+
+    */
 }

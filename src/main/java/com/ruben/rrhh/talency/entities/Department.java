@@ -19,6 +19,7 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String name; // Ejemplo: HR, IT, Finance
 
     private String employeeCount;
@@ -33,5 +34,9 @@ public class Department {
     // 🔹 Relación con Employee (1:M)
     @OneToMany(mappedBy = "department")
     private Set<Employee> employees = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
 }

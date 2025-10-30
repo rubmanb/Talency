@@ -38,6 +38,10 @@ public class User {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
     // Campos de control
     private boolean isActive = true;
     private LocalDateTime createdAt;
