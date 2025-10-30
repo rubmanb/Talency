@@ -102,6 +102,7 @@ export class Employees implements OnInit {
         this.loadEmployees();
         this.resetForm();
         this.setTab('list');
+        console.log(employee)
       });
     } else {
       this.employeeService.create(employee).subscribe(() => {
@@ -122,7 +123,7 @@ export class Employees implements OnInit {
       contractExpireDate: emp.contractExpireDate ? this.formatDateForInput(emp.contractExpireDate) : '',
       hireDate: emp.hireDate ? this.formatDateForInput(emp.hireDate) : '',
       fireDate: emp.fireDate ? this.formatDateForInput(emp.fireDate) : '',
-      department: emp.departmentName || ''
+      department: emp.department || ''
     };
     this.employeeForm.patchValue(formattedEmp);
     this.setTab('form');

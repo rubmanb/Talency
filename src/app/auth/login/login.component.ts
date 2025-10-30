@@ -13,6 +13,7 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class LoginComponent {
   loginData = {
+    company: '',
     username: '',
     password: ''
   };
@@ -27,7 +28,7 @@ export class LoginComponent {
     this.errorMessage = null;
 
     // Basic validation
-    if (!this.loginData.username.trim() || !this.loginData.password.trim()) {
+    if (!this.loginData.company || !this.loginData.username.trim() || !this.loginData.password.trim()) {
       this.errorMessage = 'Por favor, completa todos los campos';
       return;
     }

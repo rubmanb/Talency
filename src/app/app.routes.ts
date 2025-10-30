@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { DashboardComponent } from './layout/dashboard/dashboard.component';
+import { SuperDashboard } from './layout/super-dashboard/super-dashboard';
 
 
 export const routes: Routes = [
@@ -17,5 +18,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'employees', pathMatch: 'full' }
     ]
   },
+  {path: 'super-admin', component: SuperDashboard}, // Cerrarlo con un guard y permisos especiales y role especial
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

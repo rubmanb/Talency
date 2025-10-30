@@ -105,6 +105,10 @@ export class AuthService {
     return null;
   }
 
+  getCompanyName(): string | null {
+    return localStorage.getItem('company_name');
+  }
+
   private setUser(user: any): void {
     localStorage.setItem('user', JSON.stringify(user));
   }

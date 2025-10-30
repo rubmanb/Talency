@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class NavbarComponent implements OnInit {
   username: string = 'Usuario';
+  company_name: string = 'Company Inc.';
 
   constructor(
     private router: Router,
@@ -22,6 +23,10 @@ export class NavbarComponent implements OnInit {
 
   private loadUsername() {
     this.username = this.authService.getUsername();
+  }
+
+  private loadCompanyName() {
+    this.company_name = this.authService.getCompanyName() || 'Company Inc.';
   }
 
   logout() {
