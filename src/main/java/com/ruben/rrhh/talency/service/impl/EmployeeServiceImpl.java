@@ -12,6 +12,7 @@ import com.ruben.rrhh.talency.repository.UserRepository;
 import com.ruben.rrhh.talency.service.EmployeeService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -177,6 +178,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         dto.setEmailPersonal(employee.getEmailPersonal());
         dto.setDni(employee.getDni());
         dto.setHealthInsuranceNumber(employee.getHealthInsuranceNumber());
+        dto.setGender(employee.getGender());
         dto.setAddress(employee.getAddress());
         dto.setCity(employee.getCity());
         dto.setCountry(employee.getCountry());

@@ -53,6 +53,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/initial-setup").permitAll()
                         // Employees
                         .requestMatchers(HttpMethod.GET, "/api/employees").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/employees").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/employees").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/employees").permitAll()
                         .requestMatchers("/api/employees/**").permitAll()
                         // Users
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // .hasRole("ADMIN")

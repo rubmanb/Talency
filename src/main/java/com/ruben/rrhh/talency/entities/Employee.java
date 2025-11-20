@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +27,7 @@ public class Employee {
     private String lastName;
 
     @Column
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column
     private String gender;
@@ -64,7 +63,7 @@ public class Employee {
     private String contractType;
 
     @Column
-    private LocalDateTime contractExpireDate;
+    private LocalDate contractExpireDate;
 
     @Column
     private LocalDate hireDate; // fecha de alta en la empresa
@@ -86,6 +85,9 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "department_name", referencedColumnName = "name")
     private Department department;
+
+    /*TODO: Agregar la propiedad 'isManager' y así no tenemos que asignar el nombre a la tabla departments, sino tan solo el ID del empleado*/
+    //private boolean isManager;
 
     /*TODO -> Los datos bancarios deben cambiarse por una Entidad nueva tras el MVP
        - De momento los ubicamos al empleado.

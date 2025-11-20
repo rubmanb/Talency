@@ -70,14 +70,10 @@ public class DepartmentServiceImpl implements DepartmentService {
                     .map(e -> e.getFirstName() + " " + e.getLastName())
                     .toList());
 
-            Optional<Employee> manager = department.getEmployees().stream()
-                    .filter(e -> e.getPosition() != null && e.getPosition().toLowerCase().contains("manager"))
-                    .findFirst();
-            dto.setManagerName(manager.map(e -> e.getFirstName() + " " + e.getLastName())
-                    .orElse("Sin asignar"));
-
-            dto.setActive(department.getEmployees().stream()
-                    .anyMatch(Employee::isActive));
+            //Optional<Employee> manager = department.getEmployees().stream().findFirst();
+            dto.setManagerName(department.getManagerName());
+            dto.setBudget(department.getBudget());
+            dto.setActive(department.isActive());
         } else {
             dto.setEmployeeCount(0);
             dto.setEmployeeNames(List.of());

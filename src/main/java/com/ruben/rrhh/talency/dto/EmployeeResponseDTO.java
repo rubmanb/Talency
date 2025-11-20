@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,11 +21,12 @@ public class EmployeeResponseDTO {
     private String city;
     private String country;
     private String phone;
+    private String gender;
     private String emergencyContact;
     private String position;
     private String jobLevel;
     private String contractType;
-    private LocalDateTime contractExpireDate;
+    private LocalDate contractExpireDate;
     private LocalDate hireDate;
     private LocalDate fireDate;
     private String bankName;
@@ -40,6 +40,6 @@ public class EmployeeResponseDTO {
     private String departmentName;
     private List<VacationHistoryDTO> vacationHistory; // para mostrar el historial de vacaciones
     private boolean active;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 }
 

@@ -10,6 +10,7 @@ public class DepartmentResponseDTO {
 
     private Long id;
     private String name;
+    private Integer budget;
     private int employeeCount;
     private String managerName;
     private boolean active = true;
