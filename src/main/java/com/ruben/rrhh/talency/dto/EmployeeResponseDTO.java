@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Getter @Setter
@@ -37,7 +36,7 @@ public class EmployeeResponseDTO {
     private Integer vacationsDaysUsed;
     private Integer vacationsDaysRemaining; // calculado como allocated - used
     private String seniority;
-    private String departmentName;
+    private Long departmentId;
     private List<VacationHistoryDTO> vacationHistory; // para mostrar el historial de vacaciones
     private boolean active;
     private LocalDate dateOfBirth;

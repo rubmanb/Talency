@@ -12,7 +12,6 @@ import com.ruben.rrhh.talency.repository.UserRepository;
 import com.ruben.rrhh.talency.service.EmployeeService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,14 +68,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmailPersonal(dto.getEmailPersonal());
 
         // Relación con Department
-        if (dto.getDepartmentName() != null && !dto.getDepartmentName().trim().isBlank()) {
-            String normalizedName = capitalizeFirst(dto.getDepartmentName().trim());
+        if (dto.getDepartmentId() != null) {
 
-            Department department = departmentRepository.findByNameIgnoreCase(normalizedName)
-                    .orElseThrow(() -> new RuntimeException("Department '" + dto.getDepartmentName() + "' not found"));
+            Department department = departmentRepository.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Department with id " + dto.getDepartmentId() + " not found"
+                    ));
 
-            employee.setDepartment(department);
+            employee.setDepartmentId(department);
         }
+
 
         // Relación con User
         if (dto.getUserId() != null) {
@@ -141,14 +142,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmailPersonal(dto.getEmailPersonal());
         employee.setActive(dto.isActive());
 
-        if (dto.getDepartmentName() != null && !dto.getDepartmentName().trim().isEmpty()) {
-            String normalizedName = capitalizeFirst(dto.getDepartmentName().trim());
+        if (dto.getDepartmentId() != null) {
 
-            Department department = departmentRepository.findByNameIgnoreCase(normalizedName)
-                    .orElseThrow(() -> new RuntimeException("Department '" + dto.getDepartmentName() + "' not found"));
+            Department department = departmentRepository.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Department with id " + dto.getDepartmentId() + " not found"
+                    ));
 
-            employee.setDepartment(department);
+            employee.setDepartmentId(department);
         }
+
 
         // Actualizar relaciones
         if (dto.getUserId() != null) {
@@ -201,7 +204,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                         (employee.getVacationsDaysUsed() != null ? employee.getVacationsDaysUsed() : 0)
         );
         dto.setSeniority(employee.getSeniority());
-        dto.setDepartmentName(employee.getDepartment() != null ? capitalize(employee.getDepartment().getName()) : null);
+        dto.setDepartmentId(
+                employee.getDepartmentId() != null
+                        ? employee.getDepartmentId().getId()
+                        : null
+        );
         dto.setActive(employee.isActive());
 
         // Mapear historial de vacaciones

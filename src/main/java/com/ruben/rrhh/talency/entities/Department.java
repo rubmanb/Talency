@@ -32,7 +32,7 @@ public class Department {
 
 
     // 🔹 Relación con Employee (1:M)
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "departmentId")
     private Set<Employee> employees = new HashSet<>();
 
     @ManyToOne

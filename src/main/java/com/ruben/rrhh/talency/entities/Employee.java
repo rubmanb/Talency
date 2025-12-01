@@ -83,8 +83,8 @@ public class Employee {
 
     // Relación con Department (M:1)
     @ManyToOne
-    @JoinColumn(name = "department_name", referencedColumnName = "name")
-    private Department department;
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    private Department departmentId;
 
     /*TODO: Agregar la propiedad 'isManager' y así no tenemos que asignar el nombre a la tabla departments, sino tan solo el ID del empleado*/
     //private boolean isManager;
