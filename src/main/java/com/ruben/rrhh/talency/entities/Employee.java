@@ -102,7 +102,7 @@ public class Employee {
     private String maritalStatus;
 
     @Column
-    private String emailPersonal;
+    private String email;
 
     @Column
     private String workSchedule; // Shift → horario de trabajo (mañana/tarde, 8h/día, etc.)

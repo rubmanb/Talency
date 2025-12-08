@@ -9,6 +9,8 @@ import com.ruben.rrhh.talency.repository.EmployeeRepository;
 import com.ruben.rrhh.talency.repository.RoleRepository;
 import com.ruben.rrhh.talency.repository.UserRepository;
 import com.ruben.rrhh.talency.service.UserService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO dto) {
-        // Validar que no exista username o email
+
+        // Validar username y email
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
@@ -46,18 +49,26 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        // Obtener y validar empleado
+        // Obtener empleado
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        // Validar que el empleado no tenga ya un usuario
+        // Verificar si ya tiene usuario
         if (employee.getUser() != null) {
             throw new RuntimeException("Employee already has a user account");
         }
 
-        // Validar roles según lógica de negocio
-        validateRoles(dto.getRoleIds(), dto.getCurrentUserRole());
+        // Obtener rol del usuario actual desde el contexto de seguridad
+        String currentUserRole = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Could not determine current user role"));
 
+        // Validar roles
+        validateRoles(dto.getRoleIds(), currentUserRole);
+
+        // Crear usuario
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
@@ -66,18 +77,20 @@ public class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
 
-        // Vincular roles
+        // Asignar roles correctamente
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
         user.setRoles(new HashSet<>(roles));
 
+        // Guardar usuario
         User saved = userRepository.save(user);
 
-        // Actualizar la relación bidireccional
+        // Vincular empleado → usuario
         employee.setUser(saved);
         employeeRepository.save(employee);
 
         return mapToResponse(saved);
     }
+
 
     @Override
     public List<UserResponseDTO> getAllUsers() {

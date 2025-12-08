@@ -30,7 +30,7 @@ public class EmployeeRequestDTO {
     private String bankName;
     private String iban;
     private String maritalStatus;
-    private String emailPersonal;
+    private String email;
     private String workSchedule;
     private Integer vacationsDaysAllocated;
     private Integer vacationsDaysUsed;

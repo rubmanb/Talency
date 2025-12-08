@@ -13,7 +13,7 @@ public class EmployeeResponseDTO {
     private String firstName;
     private String lastName;
     private String fullName; // opcional, para mostrar en UI
-    private String emailPersonal;
+    private String email;
     private String dni;
     private String healthInsuranceNumber;
     private String address;

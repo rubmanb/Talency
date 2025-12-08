@@ -65,7 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // Otros
         employee.setMaritalStatus(dto.getMaritalStatus());
-        employee.setEmailPersonal(dto.getEmailPersonal());
+        employee.setEmail(dto.getEmail());
 
         // Relación con Department
         if (dto.getDepartmentId() != null) {
@@ -139,7 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // Otros
         employee.setMaritalStatus(dto.getMaritalStatus());
-        employee.setEmailPersonal(dto.getEmailPersonal());
+        employee.setEmail(dto.getEmail());
         employee.setActive(dto.isActive());
 
         if (dto.getDepartmentId() != null) {
@@ -178,7 +178,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         dto.setLastName(employee.getLastName());
         dto.setFullName(employee.getFirstName() + " " + employee.getLastName());
         dto.setDateOfBirth(employee.getDateOfBirth());
-        dto.setEmailPersonal(employee.getEmailPersonal());
+        dto.setEmail(employee.getEmail());
         dto.setDni(employee.getDni());
         dto.setHealthInsuranceNumber(employee.getHealthInsuranceNumber());
         dto.setGender(employee.getGender());

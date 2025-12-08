@@ -26,8 +26,8 @@ public class Company {
     @Column(unique = true)
     private String email;
 
-    //@Column(unique = true)
-    //private String taxId; // CIF / NIF -> de momento no es necesario añadirlo
+    @Column(unique = true)
+    private String taxId; // CIF == NIF => EMPRESA
 
     @Column
     private String address;
