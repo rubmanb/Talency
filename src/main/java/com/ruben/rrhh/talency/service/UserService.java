@@ -15,8 +15,9 @@ public interface UserService {
     void deleteUser(Long id);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndCompany_Name(String username, String company);
     List<UserResponseDTO> getActiveUsers();
     void deactivateUser(Long id);
     void activateUser(Long id);
+    User getCurrentUser();
 }

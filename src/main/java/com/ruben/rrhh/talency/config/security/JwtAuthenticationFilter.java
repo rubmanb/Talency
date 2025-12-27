@@ -57,7 +57,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Continuar si no está autenticado aún
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            // Extraer la company desde el JWT
+            String company = jwtUtil.extractCompany(jwt);
+
+            // Combinar company + username
+            String composite = company + "|" + username;
+
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(composite);
 
             if (jwtUtil.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
@@ -70,6 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
 
         filterChain.doFilter(request, response);
     }

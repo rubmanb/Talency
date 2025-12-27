@@ -19,9 +19,32 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String composite) throws UsernameNotFoundException {
+        System.out.println(composite);
+        // Esperamos formato: company|username
+        if (!composite.contains("|")) {
+            throw new UsernameNotFoundException("Invalid login format");
+        }
+
+        String[] parts = composite.split("\\|");
+        System.out.println(parts.length);
+        if (parts.length != 2) {
+            throw new UsernameNotFoundException("Invalid login format");
+        }
+
+        String companyName = parts[0];
+        String username = parts[1];
+
+        System.out.println(companyName);
+        System.out.println(username);
+
+        User user = userRepository
+                .findByUsernameAndCompany_Name(username, companyName)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "User not found: " + username + " in company " + companyName
+                        )
+                );
 
         String[] authorities = user.getRoles().stream()
                 .map(Role::getName)
@@ -31,10 +54,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .authorities(authorities)
+                .disabled(!user.isActive())
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)
-                .disabled(!user.isActive())
                 .build();
     }
 }

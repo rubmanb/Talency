@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/employees").permitAll()
                         .requestMatchers("/api/employees/**").permitAll()
                         // Users
+                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").permitAll() // .hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").permitAll() // .hasRole("ADMIN")

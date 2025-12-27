@@ -32,7 +32,7 @@ public class AuthService {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
+                            request.getCompany() + "|" + request.getUsername(),
                             request.getPassword()
                     )
             );
@@ -41,7 +41,7 @@ public class AuthService {
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            String token = jwtUtil.generateToken(userDetails);
+            String token = jwtUtil.generateToken(userDetails, request.getCompany());
 
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)

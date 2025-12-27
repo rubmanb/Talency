@@ -14,27 +14,30 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "mi_clave_super_segura_min_64_chars_1234567890123456";
+    private static final String SECRET_KEY =
+            "mi_clave_super_segura_min_64_chars_1234567890123456";
 
-    // Genera el token con claims adicionales
-    public String generateToken(Map<String, Object> extraClaims, String username) {
+    private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 24h
+
+    // Token con company + roles
+    public String generateToken(UserDetails userDetails, String company) {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("company", company);
+        claims.put("roles", userDetails.getAuthorities()
+                .stream()
+                .map(a -> a.getAuthority())
+                .toList());
+
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24h
+                .claims(claims)
+                .subject(userDetails.getUsername()) // SOLO username
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    // Genera el token solo con el usuario
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", userDetails.getAuthorities());
-        return generateToken(claims, userDetails.getUsername());
-    }
-
-    // Extrae claims del token
     public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -43,18 +46,19 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    // Obtiene el username del token
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    // Valida si el token pertenece al usuario y no ha expirado
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String extractCompany(String token) {
+        return extractAllClaims(token).get("company", String.class);
     }
 
-    // Verifica la expiración del token
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        return extractUsername(token).equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
+
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }

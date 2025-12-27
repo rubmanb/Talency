@@ -2,9 +2,11 @@ package com.ruben.rrhh.talency.service.impl;
 
 import com.ruben.rrhh.talency.dto.UserRequestDTO;
 import com.ruben.rrhh.talency.dto.UserResponseDTO;
+import com.ruben.rrhh.talency.entities.Company;
 import com.ruben.rrhh.talency.entities.Employee;
 import com.ruben.rrhh.talency.entities.Role;
 import com.ruben.rrhh.talency.entities.User;
+import com.ruben.rrhh.talency.repository.CompanyRepository;
 import com.ruben.rrhh.talency.repository.EmployeeRepository;
 import com.ruben.rrhh.talency.repository.RoleRepository;
 import com.ruben.rrhh.talency.repository.UserRepository;
@@ -27,15 +29,18 @@ public class UserServiceImpl implements UserService {
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CompanyRepository companyRepository;
 
     public UserServiceImpl(UserRepository userRepository,
                            EmployeeRepository employeeRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -80,6 +85,12 @@ public class UserServiceImpl implements UserService {
         // Asignar roles correctamente
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
         user.setRoles(new HashSet<>(roles));
+
+        // Asignar company
+        User currentUser = getCurrentUser();
+        user.setCompany(currentUser.getCompany());
+
+
 
         // Guardar usuario
         User saved = userRepository.save(user);
@@ -161,8 +172,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByUsernameAndCompany_Name(String username, String company) {
+        return userRepository.findByUsernameAndCompany_Name(username, company);
     }
 
     @Override
@@ -188,7 +199,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    // 🔐 Validación de roles según permisos
+    // Validación de roles según permisos
     private void validateRoles(List<Long> roleIds, String currentUserRole) {
         List<Role> selectedRoles = roleRepository.findAllById(roleIds);
 
@@ -230,4 +241,19 @@ public class UserServiceImpl implements UserService {
 
         return dto;
     }
+    @Override
+    public User getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        String username = authentication.getName(); // username o email según tu config
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
+    }
+
+
 }

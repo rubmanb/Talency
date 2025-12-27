@@ -3,7 +3,7 @@ package com.ruben.rrhh.talency.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,13 +42,13 @@ public class Company {
     private String phone;
 
     @Column
-    private boolean active = true;
+    private Boolean active = true;
 
     @Column
     private String subscriptionPlan; // FREE, STANDARD, PREMIUM
 
     @Column
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     // Relaciones
     @OneToMany(mappedBy = "company")

@@ -28,7 +28,4 @@ public class UserRequestDTO {
         private List<Long> roleIds;
 
         private String currentUserRole; // Para validaciones internas
-
-
-
 }

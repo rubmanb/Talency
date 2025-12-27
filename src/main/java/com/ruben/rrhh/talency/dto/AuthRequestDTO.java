@@ -7,6 +7,9 @@ import lombok.Setter;
 @Getter @Setter
 public class AuthRequestDTO {
     @NotBlank
+    private String company;
+    @NotBlank
     private String username;
-    @NotBlank private String password;
+    @NotBlank
+    private String password;
 }

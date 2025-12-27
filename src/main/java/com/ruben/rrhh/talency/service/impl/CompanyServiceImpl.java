@@ -43,7 +43,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         Company company = Company.builder()
                 .name(dto.getName())
-                //.taxId(dto.getTaxId())
+                .taxId(dto.getTaxId())
                 .address(dto.getAddress())
                 .city(dto.getCity())
                 .country(dto.getCountry())
@@ -61,7 +61,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
         company.setName(dto.getName());
-        //company.setTaxId(dto.getTaxId());
+        company.setTaxId(dto.getTaxId());
         company.setAddress(dto.getAddress());
         company.setCity(dto.getCity());
         company.setCountry(dto.getCountry());
@@ -81,12 +81,12 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyResponseDTO dto = new CompanyResponseDTO();
         dto.setId(company.getId());
         dto.setName(company.getName());
-        //dto.setTaxId(company.getTaxId());
+        dto.setTaxId(company.getTaxId());
         dto.setAddress(company.getAddress());
         dto.setCity(company.getCity());
         dto.setCountry(company.getCountry());
         dto.setPhone(company.getPhone());
-        dto.setActive(company.isActive());
+        dto.setActive(company.getActive());
         return dto;
     }
 }

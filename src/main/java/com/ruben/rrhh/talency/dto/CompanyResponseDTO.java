@@ -8,7 +8,7 @@ import lombok.Setter;
 public class CompanyResponseDTO {
     private Long id;
     private String name;
-    //private String taxId;
+    private String taxId;
     private String address;
     private String city;
     private String country;
