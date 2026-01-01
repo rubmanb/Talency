@@ -1,19 +1,59 @@
 package com.ruben.rrhh.talency.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 public class AuthResponseDTO {
-    private String token;
-    private String type = "Bearer";
+
+    @JsonProperty("accessToken")
+    private String accessToken;
+
+    @JsonProperty("refreshToken")
+    private String refreshToken;
+
+    @JsonProperty("tokenType")
+    private String tokenType = "Bearer";
+
+    @JsonProperty("roles")
     private List<String> roles;
 
-    public AuthResponseDTO(String token, String bearer, List<String> roles) {
-        this.token = token;
-        this.type = type;
+    @JsonProperty("expiresIn")
+    private Long expiresIn; // tiempo en milisegundos
+
+    @JsonProperty("username")
+    private String username;
+
+    @JsonProperty("company")
+    private String company;
+
+    // Constructor por defecto
+    public AuthResponseDTO() {
+    }
+
+    // Constructor completo
+    public AuthResponseDTO(String accessToken, String refreshToken, String tokenType,
+                           List<String> roles, Long expiresIn, String username, String company) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tokenType = tokenType;
         this.roles = roles;
+        this.expiresIn = expiresIn;
+        this.username = username;
+        this.company = company;
+    }
+
+    // Constructor simplificado (para compatibilidad)
+    public AuthResponseDTO(String accessToken, String refreshToken, String tokenType,
+                           List<String> roles, Long expiresIn) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tokenType = tokenType;
+        this.roles = roles;
+        this.expiresIn = expiresIn;
     }
 }
