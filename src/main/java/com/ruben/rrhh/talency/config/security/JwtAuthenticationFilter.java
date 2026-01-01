@@ -61,10 +61,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extraer la company desde el JWT
             String company = jwtUtil.extractCompany(jwt);
 
-            // Combinar company + username
-            String composite = company + "|" + username;
+            System.out.println("JWT username: " + username);
+            System.out.println("JWT company: " + company);
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(composite);
+            // VERIFICACIÓN IMPORTANTE: Asegurarnos de que el username no ya contenga la compañía
+            String finalUsername;
+            if (username.contains("|")) {
+                // Si el username ya tiene formato company|username, usarlo directamente
+                finalUsername = username;
+                System.out.println("Username already contains company: " + finalUsername);
+            } else {
+                // Si no, construir el formato compuesto
+                finalUsername = company + "|" + username;
+                System.out.println("Constructed composite: " + finalUsername);
+            }
+
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(finalUsername);
 
             if (jwtUtil.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
@@ -78,8 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-
         filterChain.doFilter(request, response);
     }
-
 }

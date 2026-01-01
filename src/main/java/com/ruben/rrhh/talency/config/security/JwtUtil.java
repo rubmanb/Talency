@@ -32,7 +32,14 @@ public class JwtUtil {
 
         // Extraer solo el username del composite (company|username)
         String compositeUsername = userDetails.getUsername();
-        String username = compositeUsername.split("\\|")[1];
+        String username;
+
+        if (compositeUsername.contains("|")) {
+            username = compositeUsername.split("\\|")[1];
+        } else {
+            username = compositeUsername;
+        }
+
         claims.put("username", username);
 
         // Extraer roles sin el prefijo ROLE_
@@ -44,7 +51,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername()) // Guardamos el composite
+                .subject(username) // Solo username en el subject
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -59,8 +66,14 @@ public class JwtUtil {
                 .getPayload();
     }
 
+    // Método auxiliar para extraer cualquier claim
+    private <T> T extractClaim(String token, java.util.function.Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
     public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+        return extractClaim(token, Claims::getSubject); // Esto ahora devolverá solo el username
     }
 
     public String extractCompany(String token) {

@@ -37,6 +37,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDTO authenticate(AuthRequestDTO request) {
+        System.out.println(request);
         try {
             String authIdentifier = request.getCompany() + "|" + request.getUsername();
 

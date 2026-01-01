@@ -106,7 +106,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Convertir roles a GrantedAuthority
         Collection<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
+                .map(role -> new SimpleGrantedAuthority(role.getName().toUpperCase()))
                 .collect(Collectors.toList());
 
         // Retornamos con el formato compuesto
