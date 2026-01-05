@@ -27,5 +27,4 @@ public class UserRequestDTO {
         @NotEmpty(message = "At least one role must be assigned")
         private List<Long> roleIds;
 
-        private String currentUserRole; // Para validaciones internas
 }

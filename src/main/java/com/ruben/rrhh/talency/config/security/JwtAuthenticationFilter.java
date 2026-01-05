@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("JWT username: " + username);
             System.out.println("JWT company: " + company);
 
-            // VERIFICACIÓN IMPORTANTE: Asegurarnos de que el username no ya contenga la compañía
+            // VERIFICACIÓN IMPORTANTE: Asegurarnos de que el username ya no contenga la compañía
             String finalUsername;
             if (username.contains("|")) {
                 // Si el username ya tiene formato company|username, usarlo directamente

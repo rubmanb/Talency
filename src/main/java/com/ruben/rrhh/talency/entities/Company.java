@@ -44,8 +44,8 @@ public class Company {
     @Column
     private Boolean active = true;
 
-    @Column
-    private String subscriptionPlan; // FREE, STANDARD, PREMIUM
+    @OneToOne(mappedBy = "company")
+    private Subscription subscription; // FREE, STANDARD, PREMIUM
 
     @Column
     private LocalDate createdAt;

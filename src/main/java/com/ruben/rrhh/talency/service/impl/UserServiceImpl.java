@@ -29,24 +29,20 @@ public class UserServiceImpl implements UserService {
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CompanyRepository companyRepository;
 
     public UserServiceImpl(UserRepository userRepository,
                            EmployeeRepository employeeRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder,
-                           CompanyRepository companyRepository) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.companyRepository = companyRepository;
     }
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO dto) {
 
-        // Validar username y email
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
@@ -54,26 +50,9 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        // Obtener empleado
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        // Verificar si ya tiene usuario
-        if (employee.getUser() != null) {
-            throw new RuntimeException("Employee already has a user account");
-        }
-
-        // Obtener rol del usuario actual desde el contexto de seguridad
-        String currentUserRole = SecurityContextHolder.getContext().getAuthentication()
-                .getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Could not determine current user role"));
-
-        // Validar roles
-        validateRoles(dto.getRoleIds(), currentUserRole);
-
-        // Crear usuario
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
@@ -82,20 +61,14 @@ public class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
 
-        // Asignar roles correctamente
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
+        if (roles.isEmpty()) {
+            throw new RuntimeException("At least one role must be assigned");
+        }
         user.setRoles(new HashSet<>(roles));
 
-        // Asignar company
-        User currentUser = getCurrentUser();
-        user.setCompany(currentUser.getCompany());
-
-
-
-        // Guardar usuario
         User saved = userRepository.save(user);
 
-        // Vincular empleado → usuario
         employee.setUser(saved);
         employeeRepository.save(employee);
 
@@ -116,11 +89,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto, String currentUserRole) {
+    public Optional<UserResponseDTO> updateUser(Long id, UserRequestDTO dto) {
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Validar unicidad de username y email (excluyendo el actual)
         if (userRepository.existsByUsernameAndIdNot(dto.getUsername(), id)) {
             throw new RuntimeException("Username already exists");
         }
@@ -135,15 +108,10 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        // Validar roles según permisos del usuario actual
-        validateRoles(dto.getRoleIds(), currentUserRole);
-
-        // Actualizar roles
         List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
         user.setRoles(new HashSet<>(roles));
 
-        User updated = userRepository.save(user);
-        return Optional.of(mapToResponse(updated));
+        return Optional.of(mapToResponse(userRepository.save(user)));
     }
 
     @Override
@@ -171,10 +139,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    @Override
-    public Optional<User> findByUsernameAndCompany_Name(String username, String company) {
-        return userRepository.findByUsernameAndCompany_Name(username, company);
-    }
+//    @Override
+//    public Optional<User> findByUsernameAndCompany_Name(String username, String company) {
+//        return userRepository.findByUsernameAndCompany_Name(username, company);
+//    }
 
     @Override
     public List<UserResponseDTO> getActiveUsers() {
@@ -241,19 +209,7 @@ public class UserServiceImpl implements UserService {
 
         return dto;
     }
-    @Override
-    public User getCurrentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("No authenticated user found");
-        }
-
-        String username = authentication.getName(); // username o email según tu config
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
-    }
 
 
 }

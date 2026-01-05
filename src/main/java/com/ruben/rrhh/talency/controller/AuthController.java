@@ -1,10 +1,8 @@
 package com.ruben.rrhh.talency.controller;
 
 import com.ruben.rrhh.talency.config.security.JwtUtil;
-import com.ruben.rrhh.talency.dto.AuthRequestDTO;
-import com.ruben.rrhh.talency.dto.AuthResponseDTO;
-import com.ruben.rrhh.talency.dto.RefreshTokenRequestDTO;
-import com.ruben.rrhh.talency.dto.RefreshTokenResponseDTO;
+import com.ruben.rrhh.talency.dto.*;
+import com.ruben.rrhh.talency.service.AuthRegisterService;
 import com.ruben.rrhh.talency.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,10 +18,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtUtil jwtUtil; // Añadir esta dependencia
+    private final AuthRegisterService registerService;
 
-    public AuthController(AuthService authService, JwtUtil jwtUtil) {
+    public AuthController(AuthService authService, JwtUtil jwtUtil, AuthRegisterService registerService) {
         this.authService = authService;
         this.jwtUtil = jwtUtil;
+        this.registerService = registerService;
     }
 
     @PostMapping("/login")
@@ -78,5 +78,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Logout failed", "message", e.getMessage()));
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO dto) {
+        return ResponseEntity.ok(registerService.register(dto));
     }
 }
