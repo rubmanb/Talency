@@ -16,81 +16,93 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Transactional
 public class AuthRegisterService {
 
-    private final CompanyRepository companyRepository;
-    private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final SubscriptionService subscriptionService;
     private final PasswordEncoder passwordEncoder;
+    private final CompanyRepository companyRepository;
+    private final EmployeeRepository employeeRepository;
+    private final SubscriptionService subscriptionService;
 
-    public AuthRegisterService(CompanyRepository companyRepository, EmployeeRepository employeeRepository, UserRepository userRepository, RoleRepository roleRepository, SubscriptionService subscriptionService, PasswordEncoder passwordEncoder) {
-        this.companyRepository = companyRepository;
-        this.employeeRepository = employeeRepository;
+    public AuthRegisterService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder, CompanyRepository companyRepository, EmployeeRepository employeeRepository, SubscriptionService subscriptionService
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.subscriptionService = subscriptionService;
         this.passwordEncoder = passwordEncoder;
+        this.companyRepository = companyRepository;
+        this.employeeRepository = employeeRepository;
+        this.subscriptionService = subscriptionService;
     }
 
     public RegisterResponseDTO register(RegisterRequestDTO dto) {
 
-        if (companyRepository.existsByTaxId(dto.getTaxId())) {
-            throw new RuntimeException("Company already exists");
-        }
-
+        // 1️⃣ Crear COMPANY ficticia (onboarding pendiente)
         Company company = companyRepository.save(
                 Company.builder()
-                        .name(dto.getCompanyName())
-                        .taxId(dto.getTaxId())
-                        .email(dto.getCompanyEmail())
-                        .country(dto.getCountry())
+                        .name("Company_" + System.currentTimeMillis())
+                        .email(dto.getEmail())
                         .active(true)
                         .createdAt(LocalDate.now())
                         .build()
         );
 
-        subscriptionService.createInitialSubscription(company);
-
+        // 2️⃣ Crear EMPLOYEE OWNER (campos obligatorios)
         Employee ownerEmployee = employeeRepository.save(
                 Employee.builder()
                         .firstName("Owner")
-                        .lastName(company.getName())
-                        .position("Owner")
-                        .company(company)
+                        .lastName("Pending")
+                        .dni("TEMP-" + System.currentTimeMillis())
+                        .healthInsuranceNumber("SSN-" + System.currentTimeMillis())
+                        .position("OWNER")
+                        .hireDate(LocalDate.now())
                         .active(true)
+                        .company(company)
+                        .email(dto.getEmail())
                         .build()
         );
 
+        // 3️⃣ Generar USERNAME (o.pendiente → onboarding)
+        String username = "o.pending_" + UUID.randomUUID().toString().substring(0, 8);
+
+        // 4️⃣ Obtener rol OWNER
         Role ownerRole = roleRepository.findByName("ROLE_OWNER")
                 .orElseThrow(() -> new RuntimeException("ROLE_OWNER missing"));
 
+        // 5️⃣ Crear USER
         User user = userRepository.save(
                 User.builder()
-                        .username(dto.getUsername())
                         .email(dto.getEmail())
+                        .username(username)
                         .password(passwordEncoder.encode(dto.getPassword()))
                         .company(company)
                         .employee(ownerEmployee)
-                        .isActive(true)
                         .roles(Set.of(ownerRole))
+                        .isActive(true)
+                        .createdAt(java.time.LocalDateTime.now())
                         .build()
         );
 
+        // 6️⃣ Enlazar employee ↔ user
         ownerEmployee.setUser(user);
+        employeeRepository.save(ownerEmployee);
 
+        // 7️⃣ Crear SUSCRIPCIÓN FREE (ligada a company)
+        subscriptionService.createInitialSubscription(company);
+
+        // 8️⃣ Respuesta
         RegisterResponseDTO response = new RegisterResponseDTO();
-        response.setCompanyId(company.getId());
-        response.setCompanyName(company.getName());
-        response.setSubscriptionPlan("FREE");
-        response.setUserId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setToken("JWT_GENERATED_HERE");
+        response.setEmail(user.getEmail());
+        response.setToken("JWT_GENERATED_HERE"); // luego lo conectamos al JwtUtil
 
         return response;
     }
+
 }

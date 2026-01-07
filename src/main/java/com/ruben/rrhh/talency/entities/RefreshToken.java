@@ -21,7 +21,7 @@ public class RefreshToken {
     private String token;
 
     @Column(nullable = false)
-    private String username;
+    private String email;
 
     @Column(nullable = false)
     private String company;

@@ -1,5 +1,6 @@
 package com.ruben.rrhh.talency.config.security;
 
+import com.ruben.rrhh.talency.service.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -26,24 +27,24 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration:604800000}") // 7 días por defecto
     private long refreshExpiration;
 
-    public String generateToken(UserDetails userDetails, String company) {
+    public String generateToken(CustomUserDetails customUserDetails, String company) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("company", company);
 
         // Extraer solo el username del composite (company|username)
-        String compositeUsername = userDetails.getUsername();
-        String username;
+        String compositeEmail = customUserDetails.getUsername();
+        String email;
 
-        if (compositeUsername.contains("|")) {
-            username = compositeUsername.split("\\|")[1];
+        if (compositeEmail.contains("|")) {
+            email = compositeEmail.split("\\|")[1];
         } else {
-            username = compositeUsername;
+            email = compositeEmail;
         }
 
-        claims.put("username", username);
+        claims.put("email", email);
 
         // Extraer roles sin el prefijo ROLE_
-        List<String> roles = userDetails.getAuthorities().stream()
+        List<String> roles = customUserDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(auth -> auth.replace("ROLE_", ""))
                 .toList();
@@ -51,7 +52,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(username) // Solo username en el subject
+                .subject(email) // Solo email en el subject
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -72,7 +73,7 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject); // Esto ahora devolverá solo el username
     }
 
@@ -85,8 +86,8 @@ public class JwtUtil {
         return extractAllClaims(token).get("roles", List.class);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername())
+    public boolean isTokenValid(String token, CustomUserDetails customUserDetails) {
+        return extractEmail(token).equals(customUserDetails.getUsername())
                 && !isTokenExpired(token);
     }
 

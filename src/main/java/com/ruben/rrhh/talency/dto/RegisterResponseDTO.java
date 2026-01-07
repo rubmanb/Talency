@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class RegisterResponseDTO {
 
-    private Long companyId;
-    private String companyName;
-    private String subscriptionPlan;
+//    private Long companyId;
+//    private String companyName;
+//    private String subscriptionPlan;
 
-    private Long userId;
-    private String username;
+//    private Long userId;
+    private String email;
     private String token;
 }

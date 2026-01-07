@@ -15,106 +15,69 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService{
     private final UserRepository userRepository;
 
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Método que usa Spring Security INTERNAMENTE
+     * Aquí recibirá: company|email
+     */
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String composite) throws UsernameNotFoundException {
-        System.out.println("Trying to authenticate: " + composite);
+    public UserDetails loadUserByUsername(String composite)
+            throws UsernameNotFoundException {
 
-        // Esperamos formato: company|username
         if (!composite.contains("|")) {
-            throw new UsernameNotFoundException("Invalid login format. Expected: company|username");
+            throw new UsernameNotFoundException("Invalid login format. Expected: company|email");
         }
 
-        String[] parts = composite.split("\\|");
-
-        if (parts.length != 2) {
-            throw new UsernameNotFoundException("Invalid login format. Expected: company|username");
-        }
-
+        String[] parts = composite.split("\\|", 2);
         String companyName = parts[0];
-        String username = parts[1];
+        String email = parts[1];
 
-        System.out.println("Looking for user: " + username + " in company: " + companyName);
-
-        User user = userRepository
-                .findByUsernameAndCompany_Name(username, companyName)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "User not found: " + username + " in company " + companyName
-                        )
-                );
-
-        // Verificar si el usuario está activo
-        if (!user.isActive()) {
-            throw new UsernameNotFoundException("User account is disabled");
-        }
-
-        // Verificar si la compañía está activa
-        if (user.getCompany() != null && !user.getCompany().getActive()) {
-            throw new UsernameNotFoundException("Company account is disabled");
-        }
-
-        // Convertir roles a GrantedAuthority
-        Collection<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
-                .collect(Collectors.toList());
-
-        System.out.println("User authenticated successfully: " + user.getUsername());
-        System.out.println("Authorities: " + authorities);
-
-        // Usamos el composite (company|username) como username para Spring Security
-        return new org.springframework.security.core.userdetails.User(
-                composite, // company|username
-                user.getPassword(),
-                true, // enabled
-                true, // accountNonExpired
-                true, // credentialsNonExpired
-                true, // accountNonLocked
-                authorities
-        );
+        return loadUserByEmailAndCompany(email, companyName);
     }
 
     /**
-     * Método adicional para cargar usuario cuando tenemos username y company por separado
+     * Método de uso manual (refresh token, etc.)
      */
     @Transactional
-    public UserDetails loadUserByUsernameAndCompany(String username, String companyName) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByEmailAndCompany(
+            String email,
+            String companyName
+    ) {
         User user = userRepository
-                .findByUsernameAndCompany_Name(username, companyName)
+                .findByEmailAndCompany_Name(email, companyName)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "User not found: " + username + " in company " + companyName
+                                "User not found: " + email + " in company " + companyName
                         )
                 );
 
-        // Verificar si el usuario está activo
         if (!user.isActive()) {
             throw new UsernameNotFoundException("User account is disabled");
         }
 
-        // Verificar si la compañía está activa
-        if (user.getCompany() != null && !user.getCompany().getActive()) {
+        if (!user.getCompany().getActive()) {
             throw new UsernameNotFoundException("Company account is disabled");
         }
 
-        // Convertir roles a GrantedAuthority
-        Collection<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().toUpperCase()))
-                .collect(Collectors.toList());
+        Collection<GrantedAuthority> authorities =
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                        .collect(Collectors.toList());
 
-        // Retornamos con el formato compuesto
-        return new org.springframework.security.core.userdetails.User(
-                companyName + "|" + username,
+
+        return new CustomUserDetails(
+                user.getEmail(),
+                companyName,
                 user.getPassword(),
-                true, true, true, true,
-                authorities
+                authorities,
+                true
         );
     }
 }

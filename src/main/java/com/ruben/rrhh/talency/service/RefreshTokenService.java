@@ -26,12 +26,12 @@ public class RefreshTokenService {
      * Crea un nuevo refresh token para un usuario
      */
     @Transactional
-    public RefreshToken createRefreshToken(String username, String company) {
+    public RefreshToken createRefreshToken(String email, String company) {
         // Primero, eliminar tokens antiguos del mismo usuario para evitar múltiples tokens activos
-        refreshTokenRepository.deleteByUsernameAndCompany(username, company);
+        refreshTokenRepository.deleteByEmailAndCompany(email, company);
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUsername(username);
+        refreshToken.setEmail(email);
         refreshToken.setCompany(company);
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpireAt(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -76,8 +76,8 @@ public class RefreshTokenService {
      * Elimina todos los refresh tokens de un usuario
      */
     @Transactional
-    public void deleteByUsernameAndCompany(String username, String company) {
-        refreshTokenRepository.deleteByUsernameAndCompany(username, company);
+    public void deleteByEmailAndCompany(String email, String company) {
+        refreshTokenRepository.deleteByEmailAndCompany(email, company);
     }
 
     /**

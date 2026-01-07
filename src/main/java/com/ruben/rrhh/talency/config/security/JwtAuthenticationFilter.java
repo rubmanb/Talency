@@ -1,5 +1,6 @@
 package com.ruben.rrhh.talency.config.security;
 
+import com.ruben.rrhh.talency.service.CustomUserDetails;
 import com.ruben.rrhh.talency.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         try {
-            username = jwtUtil.extractUsername(jwt);
+            username = jwtUtil.extractEmail(jwt);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             System.out.println("TOKEN EXPIRADO");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -76,14 +77,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("Constructed composite: " + finalUsername);
             }
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(finalUsername);
+            CustomUserDetails customUserDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(finalUsername);
 
-            if (jwtUtil.isTokenValid(jwt, userDetails)) {
+            if (jwtUtil.isTokenValid(jwt, customUserDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
+                                customUserDetails,
                                 null,
-                                userDetails.getAuthorities()
+                                customUserDetails.getAuthorities()
                         );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

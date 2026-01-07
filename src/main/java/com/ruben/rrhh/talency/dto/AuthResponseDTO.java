@@ -25,8 +25,8 @@ public class AuthResponseDTO {
     @JsonProperty("expiresIn")
     private Long expiresIn; // tiempo en milisegundos
 
-    @JsonProperty("username")
-    private String username;
+    @JsonProperty("email")
+    private String email;
 
     @JsonProperty("company")
     private String company;
@@ -37,13 +37,13 @@ public class AuthResponseDTO {
 
     // Constructor completo
     public AuthResponseDTO(String accessToken, String refreshToken, String tokenType,
-                           List<String> roles, Long expiresIn, String username, String company) {
+                           List<String> roles, Long expiresIn, String email, String company) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.tokenType = tokenType;
         this.roles = roles;
         this.expiresIn = expiresIn;
-        this.username = username;
+        this.email = email;
         this.company = company;
     }
 

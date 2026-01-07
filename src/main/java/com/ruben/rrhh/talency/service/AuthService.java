@@ -39,7 +39,7 @@ public class AuthService {
     public AuthResponseDTO authenticate(AuthRequestDTO request) {
         System.out.println(request);
         try {
-            String authIdentifier = request.getCompany() + "|" + request.getUsername();
+            String authIdentifier = request.getCompanyName() + "|" + request.getEmail();
 
             System.out.println("Attempting authentication for: " + authIdentifier);
 
@@ -49,23 +49,23 @@ public class AuthService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            System.out.println("Authentication successful for: " + userDetails.getUsername());
+//            System.out.println("Authentication successful for: " + userDetails.getEmail());
 
             // Extraer username y company del composite
-            String[] parts = userDetails.getUsername().split("\\|");
+            String[] parts = customUserDetails.getUsername().split("\\|");
             String companyName = parts[0];
-            String username = parts[1];
+            String email = parts[1];
 
             // Generar access token
-            String accessToken = jwtUtil.generateToken(userDetails, companyName);
+            String accessToken = jwtUtil.generateToken(customUserDetails, companyName);
 
             // Crear refresh token
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(username, companyName);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(email, companyName);
 
             // Extraer roles (sin el prefijo ROLE_ para el frontend)
-            List<String> roles = userDetails.getAuthorities().stream()
+            List<String> roles = customUserDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .map(auth -> auth.replace("ROLE_", "")) // Removemos el prefijo ROLE_
                     .collect(Collectors.toList());
@@ -103,20 +103,20 @@ public class AuthService {
                     return new BadCredentialsException("Invalid refresh token");
                 });
 
-        System.out.println("Found refresh token for user: " + storedToken.getUsername() +
+        System.out.println("Found refresh token for user: " + storedToken.getEmail() +
                 ", company: " + storedToken.getCompany());
 
         // Verificar expiración
         refreshTokenService.verifyExpiration(storedToken);
 
         // Cargar detalles del usuario
-        UserDetails userDetails = userDetailsService.loadUserByUsernameAndCompany(
-                storedToken.getUsername(),
+        CustomUserDetails customUserDetails = userDetailsService.loadUserByEmailAndCompany(
+                storedToken.getEmail(),
                 storedToken.getCompany()
         );
 
         // Generar nuevo access token
-        String newAccessToken = jwtUtil.generateToken(userDetails, storedToken.getCompany());
+        String newAccessToken = jwtUtil.generateToken(customUserDetails, storedToken.getCompany());
 
         System.out.println("New access token generated successfully");
 
@@ -136,7 +136,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void revokeAllUserTokens(String username, String company) {
-        refreshTokenService.deleteByUsernameAndCompany(username, company);
+    public void revokeAllUserTokens(String email, String company) {
+        refreshTokenService.deleteByEmailAndCompany(email, company);
     }
 }
