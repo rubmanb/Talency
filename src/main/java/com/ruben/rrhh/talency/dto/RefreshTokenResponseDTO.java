@@ -13,13 +13,16 @@ public class RefreshTokenResponseDTO {
     @JsonProperty("expiresIn")
     private Long expiresIn;
 
+    private String refresToken;
+
     // Constructor por defecto
     public RefreshTokenResponseDTO() {
     }
 
     // Constructor con parámetros
-    public RefreshTokenResponseDTO(String accessToken, String tokenType, Long expiresIn) {
+    public RefreshTokenResponseDTO(String accessToken, String refresToken, String tokenType, Long expiresIn) {
         this.accessToken = accessToken;
+        this.refresToken = refresToken;
         this.tokenType = tokenType;
         this.expiresIn = expiresIn;
     }
